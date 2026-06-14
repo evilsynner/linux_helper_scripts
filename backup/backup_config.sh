@@ -29,8 +29,10 @@ read_json_file() {
         exit 1
     fi
 
-    echo "$(jq -cM ".backup_folder" $1)"
-    echo "$(jq -r ".backup_files" $1)"
+    backup_folder=$(jq -r ".backup_folder" $1)
+    mapfile -t backup_files < <(
+        jq -r ".backup_files[]" "$1"
+    )
 }
 
 
@@ -42,7 +44,9 @@ elif [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-json_file_content=$(read_json_file "$1")
+read_json_file "$1"
+echo "$backup_folder"
+echo "${backup_files[@]}"
 # for key in $json_file_content; do
 #     echo $key
 # done
