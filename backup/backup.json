@@ -1,0 +1,7 @@
+{
+    "backup_folder": "/home/foo/Desktop/backup_folder",
+    "backup_files": [
+        "/home/foo/.config/redshift.conf",
+        "/home/foo/.config/kitty"
+    ]
+}
