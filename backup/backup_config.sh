@@ -35,6 +35,24 @@ read_json_file() {
     )
 }
 
+create_backup_folder() {
+    if [ -d "$1" ]; then
+        echo -e "\e[1;33m[!] The backup folder already exists, but the files will be copied anyways.\e[0m" >&2
+        return 1
+    fi
+    mkdir "$1"
+}
+
+
+copy_files() {
+    declare -n files_array=$2
+    for file in "${files_array[@]}"; do
+        echo "$file"
+    done
+
+    echo "Folder: $1"
+}
+
 
 if [ "$#" -gt 1 ]; then
     echo -e "\e[1;31m[!] You must specify only the JSON file that contains the files and folders to be backed up.\e[0m"
@@ -45,8 +63,7 @@ elif [ "$#" -lt 1 ]; then
 fi
 
 read_json_file "$1"
-echo "$backup_folder"
-echo "${backup_files[@]}"
-# for key in $json_file_content; do
-#     echo $key
-# done
+
+create_backup_folder "$backup_folder"
+
+copy_files "$backup_folder" backup_files
