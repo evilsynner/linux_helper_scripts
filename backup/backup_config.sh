@@ -3,19 +3,34 @@
 # COLOR SEQUENCES
 # \e[COLORmSample Text\e[0m
 
-read_json_file() {
+check_json_file_structure() {
     # Check that the required keys are present in the JSON file.
+    # First, check for "backup_folder" key
     backup_folder_exists=$(jq 'has("backup_folder")' $1)
     if [[ $backup_folder_exists != "true" ]]; then
-        echo -e "\e[31m\"\e[0m\e[1;32mbackup_folder\e[0m\e[31m\" key doesn't exist in provided JSON file.\e[0m"
+        echo -e "\e[31m\"\e[0m\e[1;32mbackup_folder\e[0m\e[31m\" key doesn't exist in provided JSON file.\e[0m" >&2
+        # exit 1
+        return 1
+    fi
+
+    # Then check for "backup_files" key
+    backup_files_exists=$(jq 'has("backup_files")' $1)
+    if [[ $backup_files_exists != "true" ]]; then
+        echo -e "\e[31m\"\e[0m\e[1;32mbackup_files\e[0m\e[31m\" key doesn't exist in provided JSON file.\e[0m" >&2
+        # exit 1
+        return 1
+    fi
+
+    return 0
+}
+
+read_json_file() {
+    if ! check_json_file_structure "$1"; then
         exit 1
     fi
 
-    backup_files_exists=$(jq 'has("backup_files")' $1)
-    if [[ $backup_files_exists != "true" ]]; then
-        echo -e "\e[31m\"\e[0m\e[1;32mbackup_files\e[0m\e[31m\" key doesn't exist in provided JSON file.\e[0m"
-        exit 1
-    fi
+    echo "$(jq -cM ".backup_folder" $1)"
+    echo "$(jq -r ".backup_files" $1)"
 }
 
 
@@ -27,4 +42,7 @@ elif [ "$#" -lt 1 ]; then
     exit 1
 fi
 
-read_json_file "$1"
+json_file_content=$(read_json_file "$1")
+# for key in $json_file_content; do
+#     echo $key
+# done
