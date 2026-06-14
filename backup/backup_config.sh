@@ -47,10 +47,14 @@ create_backup_folder() {
 copy_files() {
     declare -n files_array=$2
     for file in "${files_array[@]}"; do
-        echo "$file"
+        if $(cp -r "$file" "$1"); then
+            echo -e "\e[1;32m[+] Copied succesfully: $file\e[0m"
+        else
+            echo -e "\e[1;31m[!]Error when copying: $file\e[0m" >&2
+        fi
     done
 
-    echo "Folder: $1"
+    echo -e "\e[1;32mFiles copied successfully.\e[0m"
 }
 
 
