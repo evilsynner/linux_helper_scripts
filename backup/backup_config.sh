@@ -2,6 +2,35 @@
 
 # COLOR SEQUENCES
 # \e[COLORmSample Text\e[0m
+usage() {
+    cat << EOF
+Usage:
+    $(basename "$0") <config.json>
+
+Description:
+    Creates a backup folder and copies the files/directories
+    specified in the JSON configuration file.
+
+Arguments:
+    <config.json>    Path to the JSON configuration file.
+
+Options:
+    -h, --help       Show this help message and exit.
+
+JSON format:
+    {
+        "backup_folder": "/path/to/backup",
+        "backup_files": [
+            "/path/to/file1",
+            "/path/to/file2"
+        ]
+    }
+
+Examples:
+    $(basename "$0") backup.json
+EOF
+}
+
 
 check_json_file_structure() {
     # Check that the required keys are present in the JSON file.
@@ -65,6 +94,12 @@ elif [ "$#" -lt 1 ]; then
     echo -e "\e[1;31m[!] You must specify the JSON file that contains the files and folders to be backed up.\e[0m"
     exit 1
 fi
+
+# COMPRESS_BACKUP_FOLDER=false
+# 
+# while [ "$1" != "" ]; do
+#     case 
+# done
 
 read_json_file "$1"
 
