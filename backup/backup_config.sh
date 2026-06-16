@@ -106,11 +106,11 @@ copy_files() {
 
 
 compress_backup_folder() {
-    
+    echo -e "\e[1;33m[!] Compressing backup folder to .tar.gz file.\e[0m"
 }
 
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -lt 1 ]]; then
     echo -e "\e[1;31m[!] Invalid number of arguments.\e[0m" >&2
     echo >&2
     usage >&2
