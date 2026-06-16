@@ -107,6 +107,11 @@ copy_files() {
 
 compress_backup_folder() {
     echo -e "\e[1;33m[!] Compressing backup folder to .tar.gz file.\e[0m"
+    if tar -czvf "$1.tar.gz" "$1"; then
+        echo -e "\e[1;32m[+] Compressed file created successfully.\e[0m"
+    else
+        echo -e "\e[1;31m[!] An error ocurred while creating the compressed file.\e[0m" >&2
+    fi
 }
 
 
