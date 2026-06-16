@@ -4,10 +4,11 @@
 # \e[COLORmSample Text\e[0m
 
 SCRIPT_NAME=$(basename "$0")
+
 usage() {
     cat << EOF
 Usage:
-    $SCRIPT_NAME <config.json>
+    $SCRIPT_NAME [OPTIONS] <config.json>
 
 Description:
     Creates a backup folder and copies the files/directories
@@ -17,7 +18,12 @@ Arguments:
     <config.json>    Path to the JSON configuration file.
 
 Options:
-    -h, --help       Show this help message and exit.
+    -h, --help
+        Show this help message and exit.
+
+    -c, --compress-folder
+        Compress the backup folder into a .tar.gz archive
+        after all files have been copied.
 
 JSON format:
     {
@@ -29,7 +35,15 @@ JSON format:
     }
 
 Examples:
+    # Create a normal backup
     $SCRIPT_NAME backup.json
+
+    # Create a backup and compress it
+    $SCRIPT_NAME -c backup.json
+
+    # Same as above using the long option
+    $SCRIPT_NAME --compress-folder backup.json
+
 EOF
 }
 
@@ -91,6 +105,11 @@ copy_files() {
 }
 
 
+compress_backup_folder() {
+    
+}
+
+
 if [[ $# -ne 1 ]]; then
     echo -e "\e[1;31m[!] Invalid number of arguments.\e[0m" >&2
     echo >&2
@@ -100,8 +119,33 @@ fi
 
 COMPRESS_BACKUP_FOLDER=false
 
-read_json_file "$1"
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        -c | --compress-folder)
+            COMPRESS_BACKUP_FOLDER=true
+            shift
+            ;;
+        -*)
+            echo -e "\e[1;31m[!] Unknown option $1.\e[0m" >&2
+            exit 1
+            ;;
+        *)
+            JSON_FILE="$1"
+            shift
+            ;;
+    esac
+done
+
+read_json_file "$JSON_FILE"
 
 create_backup_folder "$backup_folder"
 
 copy_files "$backup_folder" backup_files
+
+if [[ "$COMPRESS_BACKUP_FOLDER" == true ]]; then
+    compress_backup_folder "$backup_folder"
+fi
