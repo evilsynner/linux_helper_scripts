@@ -2,10 +2,12 @@
 
 # COLOR SEQUENCES
 # \e[COLORmSample Text\e[0m
+
+SCRIPT_NAME=$(basename "$0")
 usage() {
     cat << EOF
 Usage:
-    $(basename "$0") <config.json>
+    $SCRIPT_NAME <config.json>
 
 Description:
     Creates a backup folder and copies the files/directories
@@ -27,7 +29,7 @@ JSON format:
     }
 
 Examples:
-    $(basename "$0") backup.json
+    $SCRIPT_NAME backup.json
 EOF
 }
 
@@ -53,6 +55,7 @@ check_json_file_structure() {
     return 0
 }
 
+
 read_json_file() {
     if ! check_json_file_structure "$1"; then
         exit 1
@@ -63,6 +66,7 @@ read_json_file() {
         jq -r ".backup_files[]" "$1"
     )
 }
+
 
 create_backup_folder() {
     if [ -d "$1" ]; then
@@ -76,7 +80,7 @@ create_backup_folder() {
 copy_files() {
     declare -n files_array=$2
     for file in "${files_array[@]}"; do
-        if $(cp -r "$file" "$1"); then
+        if cp -ru "$file" "$1"; then
             echo -e "\e[1;32m[+] Copied succesfully: $file\e[0m"
         else
             echo -e "\e[1;31m[!]Error when copying: $file\e[0m" >&2
@@ -87,19 +91,14 @@ copy_files() {
 }
 
 
-if [ "$#" -gt 1 ]; then
-    echo -e "\e[1;31m[!] You must specify only the JSON file that contains the files and folders to be backed up.\e[0m"
-    exit 1
-elif [ "$#" -lt 1 ]; then
-    echo -e "\e[1;31m[!] You must specify the JSON file that contains the files and folders to be backed up.\e[0m"
+if [[ $# -ne 1 ]]; then
+    echo -e "\e[1;31m[!] Invalid number of arguments.\e[0m" >&2
+    echo >&2
+    usage >&2
     exit 1
 fi
 
-# COMPRESS_BACKUP_FOLDER=false
-# 
-# while [ "$1" != "" ]; do
-#     case 
-# done
+COMPRESS_BACKUP_FOLDER=false
 
 read_json_file "$1"
 
